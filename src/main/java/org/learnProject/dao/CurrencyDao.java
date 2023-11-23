@@ -73,21 +73,6 @@ public class CurrencyDao {
         }
     }
 
-    /*private boolean isCurrencyInDatabase(Currency currency) {
-        String query = "select * from currencies where code = ? or fullname = ? or sign = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, currency.getCode());
-            preparedStatement.setString(2, currency.getFullName());
-            preparedStatement.setString(3, currency.getSign());
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                return resultSet.next();
-            }
-        } catch (SQLException e) {
-            log.error("Ошибка SQL запроса", e);
-            throw new RuntimeException(e);
-        }
-    }*/
-
     public boolean createCurrency(CurrencyDto currencyDto) {
         log.info("Вызван метод создания новой валюты");
         Currency currency = CurrencyConverter.dtoToEntity(currencyDto);

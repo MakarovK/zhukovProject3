@@ -1,9 +1,9 @@
 insert into currencies(code, fullName, sign)
 values
-    ('AUD', 'Австралийский доллар', 'A$'),
-    ('EUR', 'Евро', '€'),
-    ('USD', 'Американский доллар', '$'),
-    ('RUB', 'Российский рубль', '₽');
+    ('AUD', 'Australian dollar', 'A$'),
+    ('EUR', 'EURO', '€'),
+    ('USD', 'American dollar', '$'),
+    ('RUB', 'Russian ruble', '₽');
 
 
 insert into exchangerates (baseCurrencyId, targetCurrencyId, rate)
@@ -14,4 +14,5 @@ values (1, 2, 0.67),  -- AUD к EUR
        (2, 3, 1.18),  -- EUR к USD
        (2, 4, 90.2),  -- EUR к RUB
        (3, 4, 75.3); -- USD к RUB
-select * from currencies;
+
+select * from exchangerates;

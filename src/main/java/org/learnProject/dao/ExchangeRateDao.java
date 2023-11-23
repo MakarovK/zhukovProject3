@@ -64,8 +64,11 @@ public class ExchangeRateDao {
             preparedStatement.setString(3, currency.getCode());
             preparedStatement.setString(4, currency.getSign());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                Currency currencyResult = mapCurrency(resultSet);
-                return currencyResult;
+                if (resultSet.next()) {
+                    return mapCurrency(resultSet);
+                } else {
+                    return null;
+                }
             }
         } catch (SQLException e) {
             log.error("Ошибка SQL запроса {}", e);
@@ -147,12 +150,19 @@ public class ExchangeRateDao {
             throw new RuntimeException(e);
         }
     }
+
     public boolean createExchange(ExchangeRateDto exchangeRateDto) {
         log.info("Вызван метод создания нового курса валют");
-        ExchangeRate exchangeRate = ExchangeRateConverter.dtoToEntity(exchangeRateDto);
+        ExchangeRate exchangeRate = new ExchangeRate();
+        Currency baseCurrency = getCurrencyByField(CurrencyConverter.dtoToEntity(exchangeRateDto.getBaseCurrency()));
+        Currency targetCurrency = getCurrencyByField(CurrencyConverter.dtoToEntity(exchangeRateDto.getTargetCurrency()));
+        Double rate = exchangeRateDto.getRate();
+        exchangeRate.setBaseCurrency(baseCurrency)
+                .setTargetCurrency(targetCurrency)
+                .setRate(rate);
         String query = "insert into exchangerates(baseCurrencyId, targetCurrencyId, rate) values (?, ?, ?)";
         if (isExchangeRateInDatabase(exchangeRate)) {
-            log.info("Сущность с кодами {}, {} уже существует в бд", exchangeRate.getBaseCurrency(), exchangeRate.getTargetCurrency());
+            log.info("Курсы валют с кодами {}, {} уже существует в бд", exchangeRate.getBaseCurrency(), exchangeRate.getTargetCurrency());
             return false;
         } else {
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -167,4 +177,41 @@ public class ExchangeRateDao {
             }
         }
     }
+
+    public boolean updateExchange(String baseCurrencyCode, String targetCurrencyCode, Double rate) {
+        log.info("Вызван метод изменения курса валют");
+        try {
+            ExchangeRate exchangeRate = ExchangeRateConverter.dtoToEntity(getExchangeRateByCode(baseCurrencyCode, targetCurrencyCode));
+            boolean isExchangeRate = isExchangeRateInDatabase(exchangeRate);
+            if (!isExchangeRate) {
+                return false;
+            } else {
+                String query = "update exchangerates set rate = ? where basecurrencyid = ? and targetcurrencyid = ?";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                    preparedStatement.setBigDecimal(1, BigDecimal.valueOf(rate));
+                    preparedStatement.setInt(2, exchangeRate.getBaseCurrency().getId());
+                    preparedStatement.setInt(3, exchangeRate.getTargetCurrency().getId());
+                    preparedStatement.executeUpdate();
+                    return true;
+                } catch (SQLException e) {
+                    log.error("Ошибка SQL запроса", e);
+                    throw new RuntimeException(e);
+                }
+            }
+        } catch (NullPointerException e) {
+            log.info("Сущность в БД не найдена, вылетел NullPointer");
+            return false;
+        }
+    }
+
+    public ExchangeRateDto currencyCalculation(String baseCurrencyCode, String targetCurrencyCode) {
+        log.info("Вызван метод расчёта относительно курса валют");
+        try {
+            ExchangeRate exchangeRate = ExchangeRateConverter.dtoToEntity(getExchangeRateByCode(baseCurrencyCode, targetCurrencyCode));
+            return ExchangeRateConverter.entityToDto(exchangeRate);
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+
 }
