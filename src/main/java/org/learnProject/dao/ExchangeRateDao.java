@@ -210,8 +210,29 @@ public class ExchangeRateDao {
             ExchangeRate exchangeRate = ExchangeRateConverter.dtoToEntity(getExchangeRateByCode(baseCurrencyCode, targetCurrencyCode));
             return ExchangeRateConverter.entityToDto(exchangeRate);
         } catch (NullPointerException e) {
-            return null;
+            try {
+                ExchangeRate exchangeRate = ExchangeRateConverter.dtoToEntity(getExchangeRateByCode(targetCurrencyCode, baseCurrencyCode));
+                ExchangeRate exchangeRateResult = new ExchangeRate();
+                exchangeRateResult.setId(0)
+                        .setBaseCurrency(exchangeRate.getTargetCurrency())
+                        .setTargetCurrency(exchangeRate.getBaseCurrency())
+                        .setRate(Math.pow(exchangeRate.getRate(), -1));
+                return ExchangeRateConverter.entityToDto(exchangeRateResult);
+            } catch (NullPointerException ex) {
+                try {
+                    ExchangeRate exchangeRate1 = ExchangeRateConverter.dtoToEntity(getExchangeRateByCode("USD", baseCurrencyCode));
+                    ExchangeRate exchangeRate2 = ExchangeRateConverter.dtoToEntity(getExchangeRateByCode("USD", targetCurrencyCode));
+                    ExchangeRate exchangeRateResult = new ExchangeRate();
+                    exchangeRateResult.setId(0)
+                            .setBaseCurrency(exchangeRate1.getTargetCurrency())
+                            .setTargetCurrency(exchangeRate2.getTargetCurrency())
+                            .setRate(exchangeRate2.getRate() / exchangeRate1.getRate());
+                    return ExchangeRateConverter.entityToDto(exchangeRateResult);
+                } catch (NullPointerException exc) {
+                    log.error("Невозможно найти подходящий курс валюты");
+                    return null;
+                }
+            }
         }
     }
-
 }

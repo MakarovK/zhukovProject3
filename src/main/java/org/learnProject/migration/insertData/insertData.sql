@@ -8,11 +8,10 @@ values
 
 insert into exchangerates (baseCurrencyId, targetCurrencyId, rate)
 values (1, 2, 0.67),  -- AUD к EUR
-       (1, 3, 0.75),  -- AUD к USD
+       (3, 1, 1.52),  -- USD к AUD
        (4, 2, 0.011), -- RUB к EUR
        (4, 3, 0.012), -- RUB к USD
        (2, 3, 1.18),  -- EUR к USD
-       (2, 4, 90.2),  -- EUR к RUB
-       (3, 4, 75.3); -- USD к RUB
+       (3, 4, 88.58); --  USD к RUB
 
 select * from exchangerates;

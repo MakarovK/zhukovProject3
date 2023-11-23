@@ -29,7 +29,7 @@ public class ExchangeRateServlet extends HttpServlet {
                 log.info("From {}", fromCurrencyCode);
                 log.info("To {}", toCurrencyCode);
                 log.info("Amount {}", amount);
-                exchangeRateService.currencyCalculation(fromCurrencyCode, toCurrencyCode, amount, response);
+                exchangeRateService.currencyCalculation(fromCurrencyCode.toUpperCase(), toCurrencyCode.toUpperCase(), amount, response);
                 log.info("Запрос обработан");
             } else if (pathInfo == null || pathInfo.equals("/") || pathInfo.isEmpty()) {
                 exchangeRateService.getAllExchangeRate(response);

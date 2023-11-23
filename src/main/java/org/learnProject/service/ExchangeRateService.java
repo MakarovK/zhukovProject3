@@ -186,30 +186,27 @@ public class ExchangeRateService {
         String responseJson = "";
         try {
             ExchangeRateDto exchangeRateDto = exchangeRateDao.currencyCalculation(fromCurrencyCode, toCurrencyCode);
-            if (exchangeRateDto == null) {
-                log.error("Ошибка дессериализации данных");
-                log.warn("Введены некорректные данные");
-                response.setStatus(400);
-            } else {
-                ObjectNode additionalFields = objectMapper.createObjectNode();
-                additionalFields.put("amount", amount);
-                additionalFields.put("convertedAmount", amount * exchangeRateDto.getRate());
-                ObjectNode rootNode = objectMapper.valueToTree(exchangeRateDto);
-                rootNode.set("Расчёты", additionalFields);
-                responseJson = objectMapper.writeValueAsString(rootNode);
-                response.setStatus(200);
-                response.getWriter().write(responseJson);
-            }
+            ObjectNode additionalFields = objectMapper.createObjectNode();
+            additionalFields.put("amount", amount);
+            additionalFields.put("convertedAmount", amount * exchangeRateDto.getRate());
+            ObjectNode rootNode = objectMapper.valueToTree(exchangeRateDto);
+            rootNode.set("Расчёты", additionalFields);
+            responseJson = objectMapper.writeValueAsString(rootNode);
+            response.setStatus(200);
+            response.getWriter().write(responseJson);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-        try {
-            response.getWriter().write("Введены некорректные данные");
-        } catch (IOException ex) {
-            log.error("Хз как мы тут вообще оказались");
-            throw new RuntimeException(ex);
+        } catch (NullPointerException exc) {
+            log.error("Ошибка дессериализации данных");
+            log.warn("Введены некорректные данные");
+            response.setStatus(404);
+            try {
+                response.getWriter().write("Не возможно расчитать данный курс валют");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
