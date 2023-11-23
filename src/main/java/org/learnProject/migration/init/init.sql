@@ -1,15 +1,15 @@
 create table if not exists currencies (
     id serial primary key,
-    code varchar(4) not null,
-    fullName varchar(50) not null,
-    sign varchar(4) not null
+    code varchar(4) not null unique,
+    fullName varchar(50) not null unique,
+    sign varchar(4) not null unique
 );
 
 create table if not exists exchangeRates (
     id serial primary key,
     baseCurrencyId integer not null,
     targetCurrencyId integer not null,
-    rate decimal(6) not null,
+    rate decimal(10, 6) not null,
     foreign key (baseCurrencyId) references currencies (id),
     foreign key (targetCurrencyId) references currencies (id)
 );

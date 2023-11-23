@@ -5,6 +5,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.learnProject.dto.CurrencyDto;
+
+import java.math.BigDecimal;
 
 /**
  * Класс представляет курс валют с уникальным идентификатором, Id первой валюты, Id второй валюты и курсом обмена.
@@ -24,15 +27,15 @@ public class ExchangeRate {
     /**
      * Уникальный идентификатор первой валюты, которая является базовой в данном курсе обмена.
      */
-    private int baseCurrencyId;
+    private Currency baseCurrency;
 
     /**
      * Уникальный идентификатор второй валюты, которая является целевой в данном курсе обмена.
      */
-    private int targetCurrencyId;
+    private Currency targetCurrency;
 
     /**
      * Курс обмена между базовой и целевой валютами.
      */
-    private int rate;
+    private Double rate;
 }

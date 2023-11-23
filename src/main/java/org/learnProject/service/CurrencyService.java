@@ -24,6 +24,18 @@ public class CurrencyService {
         this.currencyDao = new CurrencyDao(DatabaseConnection.getConnection());
     }
 
+    public static String getJsonBody(HttpServletRequest request) throws IOException {
+        StringBuilder jsonObject = new StringBuilder();
+        try (BufferedReader reader = request.getReader()) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                jsonObject.append(line);
+            }
+            log.info("Получен объект {}", jsonObject);
+            return jsonObject.toString();
+        }
+    }
+
     public void getAllCurrencies(HttpServletResponse response) {
         log.info("Вызван метод получения всех валют");
         List<CurrencyDto> allCurrencies = currencyDao.getAllCurrencies();
@@ -42,15 +54,15 @@ public class CurrencyService {
             if (!allCurrenciesJson.equals("[]")) {
                 response.setStatus(200);
             } else {
-                response.setStatus(202);
+                response.setStatus(404);
             }
         } catch (IOException e) {
-            log.info("Ошибка потока ввода/вывода {}", e);
+            log.error("Ошибка потока ввода/вывода {}", e);
             throw new RuntimeException(e);
         }
     }
 
-    private static boolean isValid(String input) {
+    private boolean isValid(String input) {
         String regex = "^[a-zA-Z]{3}$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(input);
@@ -77,23 +89,9 @@ public class CurrencyService {
                 log.error("Ошибка при отправке данных в ответ", e);
                 response.setStatus(500);
             }
-        } else {
-            if (currencyDto == null) {
-                log.warn("Не найдена валюта по коду в базе данных {}", currencyCode);
-                response.setStatus(404);
-            }
-        }
-    }
-
-    private String getJsonBody(HttpServletRequest request) throws IOException {
-        StringBuilder jsonCurrency = new StringBuilder();
-        try (BufferedReader reader = request.getReader()) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                jsonCurrency.append(line);
-            }
-            log.info("Получен объект {}", jsonCurrency);
-            return jsonCurrency.toString();
+        } else if (currencyDto == null) {
+            log.warn("Не найдена валюта по коду в базе данных {}", currencyCode);
+            response.setStatus(404);
         }
     }
 
@@ -115,7 +113,7 @@ public class CurrencyService {
                 response.setStatus(200);
             }
         } catch (IOException e) {
-            log.error("Ошибка SQL запроса", e);
+            log.error("Ошибка потока ввода вывода", e);
             throw new RuntimeException(e);
         }
     }

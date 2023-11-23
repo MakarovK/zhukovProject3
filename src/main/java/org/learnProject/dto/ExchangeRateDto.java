@@ -6,6 +6,8 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
+
 @NoArgsConstructor
 @Setter
 @Getter
@@ -20,15 +22,15 @@ public class ExchangeRateDto {
     /**
      * Уникальный идентификатор первой валюты, которая является базовой в данном курсе обмена.
      */
-    private int baseCurrencyId;
+    private CurrencyDto baseCurrency;
 
     /**
      * Уникальный идентификатор второй валюты, которая является целевой в данном курсе обмена.
      */
-    private int targetCurrencyId;
+    private CurrencyDto targetCurrency;
 
     /**
      * Курс обмена между базовой и целевой валютами.
      */
-    private int rate;
+    private Double rate;
 }

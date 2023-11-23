@@ -16,6 +16,7 @@ public class CurrencyServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        log.info("----------------------------------------------------------------------------------------");
         log.info("Произошло обращение к сервлету doGet по URI {}", request.getRequestURI());
         String pathInfo = request.getPathInfo();
         if (pathInfo == null || pathInfo.equals("/")) {
@@ -32,6 +33,7 @@ public class CurrencyServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        log.info("----------------------------------------------------------------------------------------");
         log.info("Произошло обращение к сервлету doPost по URI {}", request.getRequestURI());
         currencyService.createCurrency(request, response);
         log.info("Запрос обработан");
